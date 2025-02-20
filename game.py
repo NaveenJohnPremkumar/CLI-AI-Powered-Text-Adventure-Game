@@ -28,13 +28,15 @@ def encode_image_to_base64(image_path):
 def generate_story_from_image(image_path):
     img_base64 = encode_image_to_base64(image_path)
     
-    prompt = """Based on this image, create a 3-paragraph background story for a text adventure game.
-    The first paragraph should establish the setting and time period shown in the image.
-    The second paragraph should create a central conflict or challenge based on what's visible or implied in the image.
-    The third paragraph should describe the player character's specific role and immediate situation as the game begins.
-    
-    Keep the language clear and engaging, focusing on elements visible in the image.
-    Use present tense and refer to the player as "you" or "the player"."""
+    prompt = """Look carefully at the provided image and create a detailed 3-paragraph background story for a text adventure game that is deeply rooted in what you observe.
+
+    First paragraph: Analyze the visual elements, atmosphere, and details in the image to vividly describe the setting and time period. Include specific details about the environment, architecture, technology level, weather, or other notable features you can see.
+
+    Second paragraph: Based on the mood, objects, characters, or situations depicted in the image, construct a central conflict or challenge. Focus on elements that are either directly visible or strongly suggested by the scene - perhaps a looming threat, a mysterious object, signs of recent conflict, or environmental hazards.
+
+    Third paragraph: Drawing from the scene shown, establish the player character's role and immediate circumstances. Consider their apparent position in the image, any visible equipment or clothing they might have, and their relationship to the environment and conflict you've described.
+
+    Keep your descriptions grounded in what you can actually see in the image. Use present tense and refer to the player as "you" or "the player". Ensure every detail you include is supported by visual evidence from the provided image."""
     
     story = ""
     inside_think = False
@@ -58,29 +60,34 @@ def generate_story_from_image(image_path):
     return story
 
 def generate_story_text():
-    prompt = """Create a 3-paragraph background story for a text adventure game. 
-    The first paragraph should establish the setting and time period. The second 
-    paragraph should explain the central conflict or challenge that drives the 
-    story. The third paragraph should describe the player character's specific 
-    role and immediate situation as the game begins.
-    
-    Keep the language clear and engaging, avoiding complex fantasy names or 
-    excessive worldbuilding details. Focus on information that directly impacts 
-    the player's understanding and choices. Include at least one specific detail 
-    about the environment, one key character or faction besides the player, and one
-    immediate goal or task.
-    
-    The background should leave room for player agency while providing clear 
-    direction. Don't reveal the entire plot - just enough context for the player 
-    to make meaningful decisions. Don't mention anything about the paragraphs.
-    There is only 1 player, which will be the user.  Remember to just
-    give the background story and only that. Use present tense and refer to the player as "you" or "the player".
+    game_prompt = """
+    Generate the background for a text-based adventure game. The world should be filled with mystery and challenges, and the player will uncover its history as they explore. 
+
+    ### Structure:
+    1. **Setting:** 
+    - Describe a unique world (e.g., fantasy, sci-fi, post-apocalyptic).  
+    - Establish the current state of the world and any major conflicts.  
+
+    2. **Main Objective:**  
+    - Define the player’s overarching goal (e.g., escape, find an artifact, solve a mystery).  
+
+    3. **Key Locations & NPCs:**  
+    - Create 3-5 major locations with distinct challenges.  
+    - Introduce key NPCs and factions that shape the story.  
+
+    4. **Dynamic Elements:**  
+    - Ensure the world evolves based on the player’s choices.  
+    - Leave room for AI-generated details to emerge during gameplay.  
+
+    Keep descriptions immersive but brief. The game world should unfold naturally as the player interacts with it.
+    Output should be in paragraph format. Limit the output to 3 paragraphs.
     """
+
     
     inside_think = False
     
     story = ""
-    for part in generate(model='deepseek-r1', prompt=prompt, stream=True):
+    for part in generate(model='deepseek-r1:1.5b', prompt=game_prompt, stream=True):
         response = part['response']
         if '<think>' in response:
             inside_think = True
@@ -164,7 +171,7 @@ def main():
     Remember the player's actions and use them to shape the story dynamically. Only respond when you receive a user input.
     """
 
-    llm = OllamaLLM(model="deepseek-r1",
+    llm = OllamaLLM(model="deepseek-r1:1.5b",
                      temperature=0.1)
     
     memory = ConversationBufferMemory(return_messages=True)
